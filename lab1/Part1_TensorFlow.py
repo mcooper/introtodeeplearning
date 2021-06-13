@@ -282,13 +282,12 @@ from tensorflow.keras import Model
 from tensorflow.keras.layers import Dense
 
 class SubclassModel(tf.keras.Model):
-
   # In __init__, we define the Model's layers
   def __init__(self, n_output_nodes):
     super(SubclassModel, self).__init__()
     '''TODO: Our model consists of a single Dense layer. Define this layer.''' 
-    self.dense_layer = '''TODO: Dense Layer'''
-
+    self.dense_layer = Dense(n_output_nodes)
+    
   # In the call function, we define the Model's forward pass.
   def call(self, inputs):
     return self.dense_layer(inputs)
@@ -320,18 +319,21 @@ from tensorflow.keras import Model
 from tensorflow.keras.layers import Dense
 
 class IdentityModel(tf.keras.Model):
-
   # As before, in __init__ we define the Model's layers
   # Since our desired behavior involves the forward pass, this part is unchanged
   def __init__(self, n_output_nodes):
     super(IdentityModel, self).__init__()
     self.dense_layer = tf.keras.layers.Dense(n_output_nodes, activation='sigmoid')
-
+    
   '''TODO: Implement the behavior where the network outputs the input, unchanged, 
       under control of the isidentity argument.'''
   def call(self, inputs, isidentity=False):
     x = self.dense_layer(inputs)
     '''TODO: Implement identity behavior'''
+    if isidentity:
+        return inputs
+    else:
+        return x
 
 
 # Let's test this behavior:
@@ -344,8 +346,8 @@ model = IdentityModel(n_output_nodes)
 
 x_input = tf.constant([[1,2.]], shape=(1,2))
 '''TODO: pass the input into the model and call with and without the input identity option.'''
-out_activate = # TODO
-out_identity = # TODO
+out_activate = model.call(x_input, isidentity=False)# TODO
+out_identity = model.call(x_input, isidentity=True)# TODO
 
 print("Network output with activation: {}; network identity output: {}".format(out_activate.numpy(), out_identity.numpy()))
 
@@ -403,12 +405,13 @@ x_f = 4
 for i in range(500):
   with tf.GradientTape() as tape:
     '''TODO: define the loss as described above'''
-    loss = # TODO
-
+    loss = (x - x_f)**2 # TODO
+    
   # loss minimization using gradient tape
   grad = tape.gradient(loss, x) # compute the derivative of the loss with respect to x
   new_x = x - learning_rate*grad # sgd update
   x.assign(new_x) # update the value of x
+  print(new_x)
   history.append(x.numpy()[0])
 
 # Plot the evolution of x as we optimize towards x_f!

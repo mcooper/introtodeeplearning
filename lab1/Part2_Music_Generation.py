@@ -79,6 +79,9 @@ example_song = songs[0]
 print("\nExample song: ")
 print(example_song)
 
+for s in range(len(songs)):
+    i = songs[s]
+    print(str(s) + ': ' + i[i.find('T'): i.find('Z')])
 
 # We can easily convert a song in ABC notation to an audio waveform and play it back. Be patient for this conversion to run, it can take some time.
 
@@ -155,8 +158,14 @@ print('  ...\n}')
   the number of characters in the input string
 '''
 
+#For testing
+import random
+import string
+songs_joined = ''.join(random.choice(string.ascii_letters) for i in range(200000))
+
 def vectorize_string(string):
-  # TODO
+    res = np.array([char2idx[i] for i in string])
+    return res
 
 vectorized_songs = vectorize_string(songs_joined)
 
@@ -191,9 +200,9 @@ def get_batch(vectorized_songs, seq_length, batch_size):
   idx = np.random.choice(n-seq_length, batch_size)
 
   '''TODO: construct a list of input sequences for the training batch'''
-  input_batch = # TODO
+  input_batch = [vectorized_songs[i:(i + seq_length)] for i in idx]
   '''TODO: construct a list of output sequences for the training batch'''
-  output_batch = # TODO
+  output_batch = [vectorized_songs[(i + 1):(i + seq_length + 1)] for i in idx]
 
   # x_batch, y_batch provide the true inputs and targets for network training
   x_batch = np.reshape(input_batch, [batch_size, seq_length])
@@ -203,11 +212,12 @@ def get_batch(vectorized_songs, seq_length, batch_size):
 
 # Perform some simple tests to make sure your batch function is working properly! 
 test_args = (vectorized_songs, 10, 2)
-if not mdl.lab1.test_batch_func_types(get_batch, test_args) or    not mdl.lab1.test_batch_func_shapes(get_batch, test_args) or    not mdl.lab1.test_batch_func_next_step(get_batch, test_args): 
+if not mdl.lab1.test_batch_func_types(get_batch, test_args) or \
+   not mdl.lab1.test_batch_func_shapes(get_batch, test_args) or \
+   not mdl.lab1.test_batch_func_next_step(get_batch, test_args): 
    print("======\n[FAIL] could not pass tests")
 else: 
    print("======\n[PASS] passed all tests!")
-
 
 # For each of these vectors, each index is processed at a single time step. So, for the input at time step 0, the model receives the index for the first character in the sequence, and tries to predict the index of the next character. At the next timestep, it does the same thing, but the RNN considers the information from the previous step, i.e., its updated state, in addition to the current input.
 # 
